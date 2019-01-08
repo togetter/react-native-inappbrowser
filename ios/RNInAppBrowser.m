@@ -48,7 +48,13 @@ RCT_EXPORT_METHOD(openAuth:(NSString *)authURL
 
 
   if (@available(iOS 11, *)) {
-    NSURL *url = [[NSURL alloc] initWithString: authURL];
+    NSURL *url = [NSURL URLWithString:authURL];
+    if (!url) {
+      url = [NSURL URLWithString:[authURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    }
+    if (!url) {
+      url = [NSURL URLWithString:@"http://"];
+    }
     __weak typeof(self) weakSelf = self;
     void (^completionHandler)(NSURL * _Nullable, NSError *_Nullable) = ^(NSURL* _Nullable callbackURL, NSError* _Nullable error) {
       __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -97,7 +103,13 @@ RCT_EXPORT_METHOD(open:(NSDictionary *)options
   BOOL readerMode = [options[@"readerMode"] boolValue];
 
   // Safari View Controller to authorize request
-  NSURL *url = [[NSURL alloc] initWithString:authURL];
+  NSURL *url = [NSURL URLWithString:authURL];
+  if (!url) {
+    url = [NSURL URLWithString:[authURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  }
+  if (!url) {
+    url = [NSURL URLWithString:@"http://"];
+  }
   SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:url entersReaderIfAvailable:readerMode];
   safariVC.delegate = self;
   if (@available(iOS 11.0, *)) {
